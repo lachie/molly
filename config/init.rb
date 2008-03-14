@@ -6,6 +6,7 @@ end
 
 require 'application'
 
+use_test :rspec
 dependency 'merb-haml'
 
 
@@ -27,5 +28,3 @@ require 'pp'
 require 'app'
 require 'recipes'
 require Merb.root_path('config','apps')
-
-pp App::Base.apps

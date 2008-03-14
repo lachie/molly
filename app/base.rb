@@ -5,6 +5,8 @@ module App
     def initialize(name,&block)
       @name = name
       instance_eval(&block)
+      
+      setup_recipe
     end
     
     def using_recipe(recipe)

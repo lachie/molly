@@ -1,0 +1,16 @@
+# desc "deploy the widget"
+# task :deploy do
+# end
+
+namespace :deploy do
+  desc "deploy the widget"
+  task :default do
+  end
+  
+  desc "refine the widgets"
+  task :refine do
+  end
+  
+  task :clandestine do
+  end
+end

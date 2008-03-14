@@ -9,7 +9,7 @@ module Recipes
     end
     
     def capfile
-      name / 'Capfile'
+      name.to_s / 'Capfile'
     end
     
     CAP_RE = %r{
@@ -27,7 +27,11 @@ module Recipes
     IRELEVANT_TASKS = %w{invoke shell}
     
     def recipe_tasks
-      `cap -Tv -f #{data_root}/#{capfile}`.collect do |line|
+      output = `cap -Tv -f #{data_root}/#{capfile}`
+      
+      raise "cap command failed" unless $?.success?
+      
+      output.collect do |line|
         _,task,description = *line.match(CAP_RE)
         next if !task or IRELEVANT_TASKS.include?(task)
 

@@ -13,6 +13,10 @@ module App
       self.extend App::Base.recipe(recipe)
     end
     
+    def data_root
+      ::Merb.root_path('data')
+    end
+    
     def self.apps
       @apps ||= {}
     end

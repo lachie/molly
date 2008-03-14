@@ -5,3 +5,5 @@
     =app.name
     &middot;
     =app.recipe_name
+    &middot;
+    =app.recipe_tasks.map {|(name,_)| name} * ', '

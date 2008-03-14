@@ -18,7 +18,7 @@ module Recipes
       \s+
       ([\w:]+)
       \s+
-      #
+      \#
       \s*
       (.*)
       $ 

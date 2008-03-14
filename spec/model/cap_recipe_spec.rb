@@ -20,5 +20,13 @@ describe Recipes::Capistrano do
     it "parses the Capfile" do
       @app.should have(3).recipe_tasks
     end
+    
+    it "parses the Capfile, returning tasks" do
+      @app.recipe_tasks.should == [
+        ['deploy'             ,'deploy the widget' ],
+        ['deploy:clandestine' ,''                  ],
+        ['deploy:refine'      ,'refine the widgets']
+      ]
+    end
   end
 end

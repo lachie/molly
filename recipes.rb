@@ -1,3 +1,5 @@
+require 'cap_runner'
+
 module Recipes
   module Capistrano
     def recipe_name
@@ -27,7 +29,7 @@ module Recipes
     IRELEVANT_TASKS = %w{invoke shell}
     
     def recipe_tasks
-      output = `cap -Tv -f #{data_root}/#{capfile}`
+      output = CapRunner.run("-Tv -f #{data_root}/#{capfile}")
       
       raise "cap command failed" unless $?.success?
       
@@ -37,6 +39,12 @@ module Recipes
 
         [task,description]
       end.compact
+    end
+    
+    def recipe_run_task
+      output = CapRunner.run("-f #{data_root}/#{capfile}")
+      
+      # TODO need to find out what error codes we can expect back from Capistrano
     end
   end
   

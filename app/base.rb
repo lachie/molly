@@ -2,6 +2,25 @@ module App
   class Base
     attr_reader :name
     
+    trap('CLD') do
+      puts "child diesd...#{$?}"
+      if $?
+        puts "child karked #{$?.pid}"
+        clean_pid($?.pid)
+      end
+    end
+    
+    def self.clean_pid(pid)
+      pid = pid.to_s
+      Dir[::Merb.root_path('data','**','*.pid')].each do |pidfile|
+        puts "pid #{pidfile} ... #{File.read(pidfile).chomp} ... #{pid}"
+        if pid == File.read(pidfile).chomp
+          puts "cleaning pid #{pid}"
+          File.unlink(pidfile)
+        end
+      end
+    end
+    
     def initialize(name,&block)
       @name = name
       instance_eval(&block)
@@ -14,7 +33,14 @@ module App
     end
     
     def data_root
-      ::Merb.root_path('data')
+      ::Merb.root_path('data',name.to_s)
+    end
+    
+    def pid_path(key)
+      File.join(data_root,"#{key}.pid")
+    end
+    def log_path(key)
+      File.join(data_root,"#{key}.log")
     end
     
     def self.apps

@@ -11,7 +11,11 @@ module Recipes
     end
     
     def capfile
-      name.to_s / 'Capfile'
+      'Capfile'
+    end
+    
+    def capfile_path
+      data_root / capfile
     end
     
     CAP_RE = %r{
@@ -26,25 +30,29 @@ module Recipes
       $ 
     }x
     
-    IRELEVANT_TASKS = %w{invoke shell}
+    IRRELEVANT_TASKS = %w{invoke shell}
     
     def recipe_tasks
-      output = CapRunner.run("-Tv -f #{data_root}/#{capfile}")
+      output = CapRunner.run("-Tv -f #{capfile_path}")
       
-      raise "cap command failed" unless $?.success?
+      raise "cap command failed" unless output
       
       output.collect do |line|
         _,task,description = *line.match(CAP_RE)
-        next if !task or IRELEVANT_TASKS.include?(task)
+        next if !task or IRRELEVANT_TASKS.include?(task)
 
         [task,description]
       end.compact
     end
     
-    def recipe_run_task
-      output = CapRunner.run("-f #{data_root}/#{capfile}")
+    def run_task(task)
+      key = Time.now.strftime("%Y%m%d%H%M%S")
       
-      # TODO need to find out what error codes we can expect back from Capistrano
+      if pid = CapRunner.run_async("-f #{capfile_path} #{task}", :pid => pid_path(key), :log => log_path(key))
+        return [key,pid]
+      end
+      
+      nil
     end
   end
   

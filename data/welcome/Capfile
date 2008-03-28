@@ -1,6 +1,12 @@
+role :web, "r2a7"
+
 namespace :deploy do
   desc "deploy the widget"
   task :default do
+    puts "cap is here too #{$$}"
+    sleep 20
+    run "ls"
+    #raise "foobar"
   end
   
   desc "refine the widgets"

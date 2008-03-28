@@ -4,7 +4,15 @@ class CapRecipeFixture
   include Recipes::Capistrano
   
   def name; :fixture_app end
-  def data_root; "data" end
+  def data_root; "data/fixture_app" end
+  
+  def pid_path(key)
+    'pids' / "#{key}.pid"
+  end
+  
+  def log_path(key)
+    'logs' / "#{key}.log"
+  end
 end
 
 class BadCapRecipeFixture < CapRecipeFixture
@@ -19,13 +27,12 @@ describe Recipes::Capistrano do
   
   
   it "finds the Capfile for the application" do
-    @app.capfile.should == 'fixture_app/Capfile'
+    @app.capfile_path.should == 'data/fixture_app/Capfile'
   end
-   
+
+  
   describe '#recipe_tasks' do
     before do
-      mock( $? ).success? { true }
-      
       mock( CapRunner ).run("-Tv -f data/fixture_app/Capfile") {
         %{cap deploy             # deploy the widget
 cap deploy:clandestine # 
@@ -55,22 +62,23 @@ Type `cap -e taskname' to view it.}
   
   describe '#setup_recipe with non-existent Capfile' do
     before do                                                                 
-      mock( CapRunner ).run("-Tv -f data/spots/Capfile") { "Bad bad capistrano" }
-      mock( $? ).success? { false }
-    end    
+      mock( CapRunner ).run("-Tv -f data/spots/Capfile") { nil }
+    end
    
     it "raises" do
       lambda { @bad_app.recipe_tasks }.should raise_error
     end
   end  
-  
-  describe '#recipe_run_task' do
+
+  describe '#run_task' do
     before do
-      mock( CapRunner ).run("-f data/fixture_app/Capfile deploy") { "Deploying the widget ..." }
-      mock( $? ).success? { true }
+      mock( CapRunner ).run_async("-f data/fixture_app/Capfile deploy",
+        :pid => %r{pids/\d{14}.pid},
+        :log => %r{logs/\d{14}.log}
+      ) { "Deploying the widget ..." }
     end                           
     it "runs the task deploy" do
-      @app.recipe_run_task("deploy").should be_true
+      @app.run_task("deploy").should match(/^\d{14}$/)
     end
   end
   

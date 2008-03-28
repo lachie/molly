@@ -7,7 +7,16 @@ class Foo < Merb::Controller
 
   def index
     puts "in index..."
-    render :index
+    render
+  end
+  
+  def run
+    puts "running task #{params.inspect}"
+    if @app = App::Base.apps[params[:app]]
+      render
+    else
+      redirect :index
+    end
   end
   
 end

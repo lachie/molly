@@ -1,5 +1,6 @@
 Merb.push_path(:view, Merb.root / "views")
 Merb::Router.prepare do |r|
+  r.match('/:app/:task/:command').to(:controller => 'foo', :action => ':command')
   r.match('/').to(:controller => 'foo', :action =>'index')
   r.default_routes
 end

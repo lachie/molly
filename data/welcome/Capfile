@@ -1,5 +1,7 @@
 role :web, "r2a7"
 
+set :user, 'apps'
+
 namespace :deploy do
   desc "deploy the widget"
   task :default do

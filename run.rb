@@ -9,6 +9,12 @@ app = App::Base.apps[:welcome]
 pp app.recipe_tasks
 pp app.run_task :deploy
 
+puts "going to wait for all the threads"
+Thread.list.each do |t|
+  next if t == Thread.current
+  t.join
+end
 
-puts Process.wait
+
+# puts Process.wait
 puts "done"

@@ -2,13 +2,6 @@ module App
   class Base
     attr_reader :name
     
-    trap('CLD') do
-      puts "child diesd...#{$?}"
-      if $?
-        puts "child karked #{$?.pid}"
-        clean_pid($?.pid)
-      end
-    end
     
     def self.clean_pid(pid)
       pid = pid.to_s

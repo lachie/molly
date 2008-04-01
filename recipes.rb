@@ -48,8 +48,8 @@ module Recipes
     def run_task(task)
       key = Time.now.strftime("%Y%m%d%H%M%S")
       
-      if pid = CapRunner.run_async("-f #{capfile_path} #{task}", :pid => pid_path(key), :log => log_path(key))
-        return [key,pid]
+      if thread = CapRunner.run_async("-f #{capfile_path} #{task}", :pid => pid_path(key), :log => log_path(key))
+        return key
       end
       
       nil

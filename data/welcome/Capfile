@@ -6,7 +6,8 @@ namespace :deploy do
   desc "deploy the widget"
   task :default do
     puts "cap is here too #{$$}"
-    sleep 20
+    STDERR.puts "cappy err"
+    sleep 2
     run "ls"
     #raise "foobar"
   end

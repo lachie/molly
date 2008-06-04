@@ -1,0 +1,18 @@
+%h2
+  log for
+  =@app.name
+  &mdash;
+  =@log.task
+
+%p
+  =back_to_app
+%p
+  ==run #{time_ago_in_words(@log.date)} ago
+
+  
+%p
+  %table
+    -@log.each_line do |line,stream|
+      %tr{:class => stream}
+        %td
+          =line

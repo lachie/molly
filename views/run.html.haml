@@ -1,3 +1,13 @@
 %h1 running
-=params[:app]
-=params[:task]
+
+%p
+  =params[:app]
+  =params[:task]
+
+-if @failed
+  failed
+  =@failed
+
+==[#{@key}]
+
+%a{:href => ('' / @app.name)} 

@@ -2,11 +2,4 @@
 %ul
 -App::Base.apps.each do |(name,app)|
   %li
-    =app.name
-    &middot;
-    =app.recipe_name
-    %ul
-    -app.recipe_tasks.each do |task,description|
-      %li
-        %a{:href => ('' / name / task / 'run')}=name
-        =description
+    %a{:href => ('' / name)}=app.name

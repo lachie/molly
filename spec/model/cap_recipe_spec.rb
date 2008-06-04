@@ -4,7 +4,7 @@ class CapRecipeFixture
   include Recipes::Capistrano
   
   def name; :fixture_app end
-  def data_root; "data/fixture_app" end
+  def app_root; "data/fixture_app" end
   
   def pid_path(key)
     'pids' / "#{key}.pid"

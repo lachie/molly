@@ -1,0 +1,42 @@
+%h2
+  =@app.name
+
+%p
+  %a{:href => '/'} &larr; app list
+
+%h3 tasks
+(
+%a{:href => ('' / @app.name / 'recipe')}==#{@app.recipe_name} recipe file
+)
+
+%table
+  %tbody
+    -@app.recipe_tasks.each do |task,description|
+      %tr
+        %td
+          =task
+        %td
+          =description.blank? ? '&ndash;' : description
+        %td
+          [
+          %a.run-task{:href => ('' / @app.name / 'run' / task)} run
+          ]
+          
+.runner
+  .title
+    reason
+  .reason
+    %textarea{:rows => 10, :cols => 30}
+  .button
+    %input.run{:type => 'submit', :value => 'run'}
+    or
+    %a.cancel{:href=>'#'} cancel
+
+%h3 logs
+%ul.logs
+  -@app.logs.reverse.each do |log|
+    %li{:class => log.status}
+      =time_ago_in_words(log.date)
+      ago &mdash;
+      %a{:href => ('' / @app.name / 'log' / log.key)}
+        =log.task

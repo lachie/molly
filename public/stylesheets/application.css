@@ -1,0 +1,61 @@
+body {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  text-align: center;
+}
+
+#main {
+  height: auto !important;
+  margin: 0pt auto -8.6em;
+  min-height: 100%;
+}
+
+.site {
+  margin: 0pt auto;
+  padding: 0pt 3em;
+  text-align: left;
+  width: 69em;
+}
+
+.runner {
+  border: 1px solid #aaa;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+table {
+  font-family: Monaco,"Courier New",monospace;
+  font-size: 90%;
+  width: 100%;
+}
+
+table textarea {
+  width: 95%;
+}
+
+tr.err td {
+  background: pink;
+}
+
+tr.out td {
+  background: lightblue;
+}
+
+ul.logs li {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  margin-left: 1em;
+  background-repeat: no-repeat;
+  padding-left: 20px;
+}
+ul.logs li.failure {
+  background-image: url(/images/failure.png);
+}
+ul.logs li.success {
+  background-image: url(/images/success.png);
+}                                     
+ul.logs li.running {                  
+  background-image: url(/images/running.png);
+}                                     
+ul.logs li.unknown {                  
+  background-image: url(/images/unknown.png);
+}

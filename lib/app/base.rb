@@ -1,23 +1,14 @@
+require 'fileutils'
+
 module App
   class Base
-    attr_reader :name
-    
-    
-    def self.clean_pid(pid)
-      pid = pid.to_s
-      Dir[::Merb.root_path('data','**','*.pid')].each do |pidfile|
-        puts "pid #{pidfile} ... #{File.read(pidfile).chomp} ... #{pid}"
-        if pid == File.read(pidfile).chomp
-          puts "cleaning pid #{pid}"
-          File.unlink(pidfile)
-        end
-      end
-    end
+    attr_reader :name, :last_run_key, :last_run_task
     
     def initialize(name,&block)
       @name = name
       instance_eval(&block)
       
+      setup_paths
       setup_recipe
     end
     
@@ -25,15 +16,40 @@ module App
       self.extend App::Base.recipe(recipe)
     end
     
-    def data_root
+    # paths
+    
+    def setup_paths
+      FileUtils::mkdir_p app_root
+      FileUtils::mkdir_p var_root
+    end
+    
+    def app_root
       ::Merb.root_path('data',name.to_s)
     end
     
-    def pid_path(key)
-      File.join(data_root,"#{key}.pid")
+    def var_root
+      File.join(app_root,"logs")
     end
-    def log_path(key)
-      File.join(data_root,"#{key}.log")
+    
+    def pid_path(key)
+      File.join(var_root,"#{key}.pid")
+    end
+    
+    def log_path(key,task)
+      File.join(var_root,"#{key}_#{task}.log")
+    end
+    
+    def status_path(key)
+      File.join(var_root,"#{key}.status")
+    end
+        
+    def logs
+      Dir["#{var_root}/*.log"].collect {|d| Log.new(d,self)}
+    end
+    
+    def log(key)
+      log = Dir["#{var_root}/#{key}_*.log"].first
+      Log.new(log,self)
     end
     
     def self.apps

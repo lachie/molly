@@ -71,7 +71,7 @@ class Apps < Merb::Controller
   def run
     provides :html, :json
 
-    @app.run_task(params[:task])
+    @app.run_task(params[:task],params[:reason])
     
     if request.xhr?
       display @app

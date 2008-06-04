@@ -33,10 +33,15 @@
     %a.cancel{:href=>'#'} cancel
 
 %h3 logs
-%ul.logs
-  -@app.logs.reverse.each do |log|
-    %li{:class => log.status}
-      =time_ago_in_words(log.date)
-      ago &mdash;
-      %a{:href => ('' / @app.name / 'log' / log.key)}
-        =log.task
+%table.logs
+  %tbody
+    -@app.logs.reverse.each do |log|
+      %tr
+        %td.icon
+          =image_tag("#{log.status}.png")
+        %td
+          %a{:href => ('' / @app.name / 'log' / log.key)}
+            =log.task
+        %td
+          =time_ago_in_words(log.date)
+          ago

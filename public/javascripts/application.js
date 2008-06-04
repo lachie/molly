@@ -13,6 +13,20 @@ $(function() {
     return false
   })
   
+  var gotJSON = function(data) {
+    var url = '/'+data['name']+'/log/'+data['last_run_key']
+    var tr = running[data['last_run_key']] = $('<tr>').prependTo('.logs')
+    
+    tr.append("<td><img src='/images/running.png'/></a>")
+    var td = $('<td>').appendTo(tr)
+    tr.append('<td>right now</td>')
+    
+    $('<a/>')
+      .attr('href',url)
+      .text(data['last_run_task'])
+      .appendTo(td)
+  }
+  
   $('.run', runner).click(function() {
     var text = $('.reason textarea').val(),
       url = runner.data('taskurl'),
@@ -24,17 +38,9 @@ $(function() {
       runner.hide()
       humanMsg.displayMsg("running "+task)
       
-      $.getJSON(url,function(data) {
-        var url = '/'+data['name']+'/log/'+data['last_run_key']
-        
-        var li = running[data['last_run_key']] = $('<li>').prependTo('.logs')
-                                                          .html('right now &mdash; ')
-                                                          .addClass('running')
-        $('<a>')
-          .attr('href',url)
-          .text(data['last_run_task'])
-          .appendTo(li)
-      })
+      url += '?reason='+text.replace("\n",'\\n')
+      
+      $.getJSON(url,gotJSON)
     }
       
     return false

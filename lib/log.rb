@@ -20,7 +20,14 @@ class Log
     IO.foreach(@file) do |line|
       line.chomp!
       
-      stream = line[0] == ?O ? 'out' : 'err'
+      stream = case line[0]
+                when ?O
+                  'out'
+                when ?E
+                  'err'
+                when ?R
+                  'reason'
+                end
       
       line[0,2] = ''
       yield(line,stream)

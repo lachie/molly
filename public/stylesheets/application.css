@@ -39,6 +39,14 @@ tr.out td {
   background: lightblue;
 }
 
+tr.reason td {
+  background: #ccc;
+}
+
+td.icon {
+  width: 20px;
+}
+/*
 ul.logs li {
   list-style-type: none;
   padding: 0;
@@ -47,15 +55,15 @@ ul.logs li {
   background-repeat: no-repeat;
   padding-left: 20px;
 }
-ul.logs li.failure {
+.logs li.failure {
   background-image: url(/images/failure.png);
 }
-ul.logs li.success {
+.logs li.success {
   background-image: url(/images/success.png);
 }                                     
-ul.logs li.running {                  
+.logs li.running {                  
   background-image: url(/images/running.png);
 }                                     
-ul.logs li.unknown {                  
+.logs li.unknown {                  
   background-image: url(/images/unknown.png);
-}
+}*/

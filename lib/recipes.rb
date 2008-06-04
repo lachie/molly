@@ -58,11 +58,20 @@ module Recipes
       end.compact
     end
     
-    def run_task(task)
+    def run_task(task,reason)
       key = @last_run_key = Time.now.utc.strftime("%Y%m%d%H%M%S")
       @last_run_task = task
       
-      if thread = CapRunner.run_async("-f #{capfile_path} #{task}", :pid => pid_path(key), :log => log_path(key,task), :status => status_path(key))
+      reason ||= ''
+      
+      log_path = log_path(key,task)
+      open(log_path,"w") do |f|
+        f << 'R '
+        f << reason.chomp.gsub('\n',"\nR ")
+        f << "\n"
+      end
+      
+      if thread = CapRunner.run_async("-f #{capfile_path} #{task}", :pid => pid_path(key), :log => log_path, :status => status_path(key))
         return true
       end
       

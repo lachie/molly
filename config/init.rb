@@ -27,8 +27,11 @@ end
 # require 'application'
 
 use_test :rspec
-dependencies 'merb-haml', 'merb-assets', 'activesupport'
+dependencies 'merb-haml', 'merb-assets', 'activesupport', 'merb_paginate'
 
+# gem('mislav-will_paginate')
+# require 'will_paginate/array'
+# require 'will_paginate/view_helpers'
 
 Merb::Config.use { |c|
   c[:environment]         = 'production',

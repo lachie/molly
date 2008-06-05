@@ -44,9 +44,19 @@ module Helpers
 
 end
 
+class LogLinkRenderer < MerbPaginate::LinkRenderer
+  protected
+
+  def url_options_string(page)
+    app = @template.request.params[:app]
+    "/#{app}?log_page=#{page}"
+  end
+end
+
 
 class Apps < Merb::Controller
   include Helpers
+  
   before :load_app, :exclude => [:index]
   
   def _template_location(action, type = nil, controller = controller_name)
@@ -60,6 +70,7 @@ class Apps < Merb::Controller
   end
   
   def show
+    @log_page = params[:log_page] || 1
     display @app
   end
   

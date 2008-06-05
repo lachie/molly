@@ -48,8 +48,10 @@ module App
       File.join(var_root,"#{key}.status")
     end
         
-    def logs
-      Dir["#{var_root}/*.log"].collect {|d| Log.new(d,self)}
+    def logs(page = 1)
+      Dir["#{var_root}/*.log"] \
+        .collect {|d| Log.new(d, self)} \
+        .paginate(:per_page => 5, :page => page)
     end
     
     def log(key)

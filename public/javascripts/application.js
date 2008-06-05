@@ -116,11 +116,12 @@ $(function() {
     }
     
     var url = [ '', app, 'add_task', encodeURIComponent(tasks.join(',')) ].join('/')
+      + "?"
+      + "description="+ $('.task-list .description').val()
     
     // $('.task-list')
     //   .data('task_list',[])
     //   .hide()
-    
     
     document.location = url
     return false

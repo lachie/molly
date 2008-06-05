@@ -71,6 +71,8 @@ module Recipes
         f << "\n"
       end
       
+      task.gsub!(',',' ')
+      
       if thread = CapRunner.run_async("-f #{capfile_path} #{task}", :pid => pid_path(key), :log => log_path, :status => status_path(key))
         return true
       end

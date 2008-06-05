@@ -1,6 +1,7 @@
 Merb.push_path(:view        , Merb.root / "views")
 Merb.push_path(:application , Merb.root / 'application.rb')
 Merb.push_path(:lib         , Merb.root / 'lib')
+Merb.push_path(:config      , Merb.root / 'config', 'apps.rb')
 
 Merb.push_path(:log,          Merb.log_path, nil)
 Merb.push_path(:public,       Merb.root_path("public"), nil)

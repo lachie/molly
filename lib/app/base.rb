@@ -13,6 +13,10 @@ module App
       setup_recipe
     end
     
+    def to_json(options={})
+      instance_values.only(*%w{name last_run_task last_run_key}).to_json(options)
+    end
+    
     def using_recipe(recipe)
       self.extend App::Base.recipe(recipe)
     end
@@ -58,7 +62,7 @@ module App
     end
     
     def tasks
-      recipe_tasks + user_tasks
+      recipe_tasks + (user_tasks || [])
     end
     
     def self.create(kind,name,&block)

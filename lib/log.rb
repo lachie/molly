@@ -1,19 +1,27 @@
 # encapsulates the residue of a run of a task
 
 class Log
-  attr_reader :key,:task,:date,:status
+  attr_reader :key,:task,:date
   
   def initialize(file,app)
     @file,@app = file,app
     
-    _,@key,@task = *@file.match(/(\d+)_([\w:]+)\.log/)
+    _,@key,@task = *@file.match(/(\d+)_([\w:,]+)\.log/)
     @date = DateTime.strptime(@key,"%Y%m%d%H%M%S")
     
-    begin
-      @status = File.read(@app.status_path(@key))
-    rescue Errno::ENOENT
-      @status = 'unknown'
+
+  end
+  
+  def status
+    unless @status
+      begin
+        @status = File.read(@app.status_path(@key))
+      rescue Errno::ENOENT
+        @status = 'unknown'
+      end
     end
+
+    @status
   end
   
   def each_line(&block)

@@ -3,6 +3,7 @@ require 'fileutils'
 module App
   class Base
     attr_reader :name, :last_run_key, :last_run_task
+    attr_accessor :user_tasks
     
     def initialize(name,&block)
       @name = name
@@ -54,6 +55,10 @@ module App
     
     def self.apps
       @apps ||= {}
+    end
+    
+    def tasks
+      recipe_tasks + user_tasks
     end
     
     def self.create(kind,name,&block)

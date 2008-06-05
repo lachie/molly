@@ -1,5 +1,9 @@
 %h2
   =@app.name
+  
+%script{:type=>'text/javascript'}
+  :plain
+    var app = '#{@app.name}'
 
 %p
   %a{:href => '/'} &larr; app list
@@ -11,7 +15,7 @@
 
 %table
   %tbody
-    -@app.recipe_tasks.each do |task,description|
+    -@app.tasks.each do |task,description|
       %tr
         %td
           =task
@@ -21,6 +25,22 @@
           [
           %a.run-task{:href => ('' / @app.name / 'run' / task)} run
           ]
+    %tr
+      %td
+        [
+        %a.add-task-list{:href=>'#'} + task list
+        ]
+    %tr.task-list
+      %td
+        .selected
+        .candidates
+          -@app.recipe_tasks.each do |task,_|
+            %a.candidate{:href=>'#', :name => task}==+ #{task}
+            &middot;
+      %td
+        %input.description
+      %td
+        %input.save{:value => '+', :type => 'button'}
           
 .runner
   .title

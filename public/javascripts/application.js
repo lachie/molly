@@ -56,5 +56,74 @@ $(function() {
     return false;
   })
 
+  // custom task lists
+
+  $('.task-list')
+    .hide()
+    .data('task_list',[])
+    .bind('show',function() {
+      draw_tasks()
+      $(this).show()
+    })
+  
+  $('.add-task-list').click(function() {
+    $('.task-list').trigger('show')
+    return false;
+  })
+  
+  
+  function remove_task() {
+    var task = $(this).data('task')
+    
+    var new_task_list = $.grep($('.task-list').data('task_list'),function(elt,i) {
+      return elt != task
+    })
+    
+    $('.task-list').data('task_list',new_task_list)
+    draw_tasks()
+  }
+  
+  function draw_tasks() {
+    var t = $('.task-list .selected').empty()
+    
+    $($('.task-list').data('task_list')).each(function(index,task) {
+      $('<a>')
+        .attr('href','#')
+        .text('- '+task)
+        .appendTo(t)
+        .click(remove_task)
+        .data('task',task)
+        
+      t.append(' ')
+    })
+  }
+  
+  $('.task-list .candidate').click(function() {
+    $('.task-list')
+      .data('task_list')
+      .push($(this).attr('name'))
+      
+    draw_tasks()
+    return false
+  })
+  
+  $('.task-list .save').click(function() {
+    var tasks = $('.task-list').data('task_list')
+    
+    if(tasks.length < 2) {
+      humanMsg.displayMsg("please add at least two tasks")
+      return false
+    }
+    
+    var url = [ '', app, 'add_task', encodeURIComponent(tasks.join(',')) ].join('/')
+    
+    // $('.task-list')
+    //   .data('task_list',[])
+    //   .hide()
+    
+    
+    document.location = url
+    return false
+  })
 
 })

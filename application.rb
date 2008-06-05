@@ -89,6 +89,22 @@ class Apps < Merb::Controller
     end
   end
   
+  def add_task
+    if(tasks = params[:task])
+      user_tasks = session[:user_tasks] ||= []
+      task_list = Merb::Request.unescape(tasks).gsub(/\s/,'')
+      
+      if(existing = user_tasks.find {|entry| entry[0] == task_list})
+        existing[1] = params[:description]
+      else
+        user_tasks << [task_list,params[:description]]
+      end
+    end
+    
+    redirect "/#{params[:app]}"
+  end
+  
+  
   protected
   
   def load_app
@@ -101,6 +117,8 @@ class Apps < Merb::Controller
     unless @app
       raise "unable to find app '#{params[:app]}'"
     end
+    
+    @app.user_tasks = session[:user_tasks] || []
   end
   
 end

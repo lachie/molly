@@ -46,24 +46,8 @@ tr.reason td {
 td.icon {
   width: 20px;
 }
-/*
-ul.logs li {
-  list-style-type: none;
-  padding: 0;
-  margin: 0;
-  margin-left: 1em;
-  background-repeat: no-repeat;
-  padding-left: 20px;
+
+.task-list td {
+  border-bottom: 1px solid black;
+  border-top: 1px solid black;
 }
-.logs li.failure {
-  background-image: url(/images/failure.png);
-}
-.logs li.success {
-  background-image: url(/images/success.png);
-}                                     
-.logs li.running {                  
-  background-image: url(/images/running.png);
-}                                     
-.logs li.unknown {                  
-  background-image: url(/images/unknown.png);
-}*/

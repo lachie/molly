@@ -12,8 +12,11 @@ Merb::Router.prepare do |r|
   r.match('/:app/log/:key').to(:controller => 'apps', :action => 'log')
   
   r.match('/:app').to(:controller => 'apps', :action => 'show')
-  r.match('/:app/:command').to(:controller => 'apps', :action => ':command')  
-  r.match('/:app/:command/:task').to(:controller => 'apps', :action => ':command')
+  r.match('/:app/:command').to(:controller => 'apps', :action => ':command')
+  
+  
+  # r.match('/:app/:command/:task').to(:controller => 'apps', :action => ':command')
+  r.match(%r[^/:app/:command/(.+)]).to(:controller => 'apps', :action => ':command', :task => '[3]')
   
   r.match('/').to(:controller => 'apps', :action =>'index')
   

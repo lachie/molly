@@ -15,7 +15,8 @@ class Log
   def status
     unless @status
       begin
-        @status = File.read(@app.status_path(@key))
+        status = Dir["#{@app.status_path(@key)}.*"].first || '.unknown'
+        @status = status[/\.([^\.]*)$/,1]
       rescue Errno::ENOENT
         @status = 'unknown'
       end
@@ -43,14 +44,14 @@ class Log
   end
   
   def success?
-    @status == 'success'
+    status == 'success'
   end
   
   def running?
-    @status == 'running'
+    status == 'running'
   end
   
   def failure?
-    @status == 'failure'
+    status == 'failure'
   end
 end

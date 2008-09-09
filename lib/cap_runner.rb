@@ -1,14 +1,22 @@
+require 'fileutils'
+
 class CapRunner
-   
+  
+  
   def self.run(command)
-    output = %x{cap #{command}}
+    puts "running #{Merb::Config[:cap]} #{command}"
+    output = %x{#{Merb::Config[:cap] || cap} #{command}}
     
-     $?.success? ? output : nil
+    $?.success? ? output : nil
+  rescue
+    output
   end
   
   def self.set_status(file,status)
     return unless file
-    File.open(file,'w') {|f| f << status.to_s}
+    
+    FileUtils::rm("#{file}.*")
+    FileUtils::touch("#{file}.#{status}")
   end
   
   # TODO, split this up

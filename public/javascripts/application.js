@@ -7,7 +7,7 @@ $(function() {
   
   var runner = $('<tr><td colspan="3"></td></tr>').hide()
   $('.runner').appendTo($('td',runner))
-    
+
   $('.cancel',runner).click(function() {
     runner.removeData("taskurl").hide()
     return false
@@ -40,7 +40,9 @@ $(function() {
       
       url += '?reason='+text.replace("\n",'\\n')
       
-      $.getJSON(url,gotJSON)
+      document.location = url
+      
+      // $.getJSON(url,gotJSON)
     }
       
     return false
@@ -125,6 +127,11 @@ $(function() {
     
     document.location = url
     return false
+  })
+  
+  $('a.edit').click(function() {
+    console.log("editing",$('textarea.edit').get(0))
+    window.editor($('textarea.edit').get(0))
   })
 
 })

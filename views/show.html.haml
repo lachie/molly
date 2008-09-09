@@ -57,7 +57,7 @@
 
 %table.logs
   %tbody
-    -@app.logs(@log_page).reverse.each do |log|
+    -@app.logs(@log_page).each do |log|
       %tr
         %td.icon
           =image_tag("#{log.status}.png")

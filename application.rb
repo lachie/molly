@@ -84,11 +84,13 @@ class Apps < Merb::Controller
 
     @app.run_task(params[:task],params[:reason])
     
-    if request.xhr?
-      display @app
-    else
-      redirect '' / params[:app]
-    end
+    redirect '' / @app.name / 'log' / @app.last_run_key
+    
+    # if request.xhr?
+    #       display @app
+    #     else
+    #       redirect '' / params[:app]
+    #     end
   end
   
   def log

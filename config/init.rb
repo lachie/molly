@@ -29,6 +29,15 @@ end
 use_test :rspec
 dependencies 'merb-haml', 'merb-assets', 'activesupport', 'merb_paginate'
 
+
+gem 'mojombo-grit'
+require 'grit'
+
+Grit.debug = true
+::Git = Grit::Repo.new(Merb.root)
+
+
+
 # gem('mislav-will_paginate')
 # require 'will_paginate/array'
 # require 'will_paginate/view_helpers'
@@ -46,6 +55,9 @@ Merb::Config.use { |c|
   c[:exception_details]   = true,
   c[:reload_classes]      = true,
   c[:reload_time]         = 0.5
+  
+  
+  c[:cap] = '/usr/bin/cap'
 }
 
 Merb::BootLoader.after_app_loads do
@@ -54,4 +66,6 @@ Merb::BootLoader.after_app_loads do
   require 'recipes'
   require Merb.root / 'config' / 'apps'
   # require Merb.root / 'apps'
+  
+  
 end

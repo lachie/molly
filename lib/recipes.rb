@@ -30,6 +30,7 @@ module Recipes
     def capfile_path
       app_root / capfile
     end
+    alias_method :recipe_path, :capfile_path
     
     CAP_RE = %r{
       ^
@@ -48,7 +49,7 @@ module Recipes
     def recipe_tasks
       output = CapRunner.run("-Tv -f #{capfile_path}")
       
-      raise "cap command failed" unless output
+      raise "cap command failed: #{$!}" unless output
       
       output.collect do |line|
         _,task,description = *line.match(CAP_RE)

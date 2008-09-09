@@ -2,5 +2,22 @@
 
 =back_to_app
 
-%pre
-  =@app.recipe_source
+
+:plain
+  <pre>
+    #{@app.recipe_source}
+  </pre>
+
+
+%table
+  -@app.git_log_recipe.each do |log|
+    %tr
+      %td=log.commit[0,7]
+      %td=log.time
+      %td==#{log.insertions} / #{log.deletions}
+  
+  
+%a.edit{:href=>'#'} edit
+%textarea.edit{:style=>'display:none'}
+  :plain
+    #{@app.recipe_source}

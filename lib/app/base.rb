@@ -1,4 +1,5 @@
 require 'fileutils'
+require 'ostruct'
 
 module App
   class Base
@@ -47,10 +48,13 @@ module App
     def status_path(key)
       File.join(var_root,"#{key}.status")
     end
+    
+    # logs
         
     def logs(page = 1)
       Dir["#{var_root}/*.log"] \
         .collect {|d| Log.new(d, self)} \
+        .reverse \
         .paginate(:per_page => 5, :page => page)
     end
     
@@ -66,6 +70,48 @@ module App
     def tasks
       recipe_tasks + (user_tasks || [])
     end
+    
+    
+    # commit c4555717a9f6002a05d806e8fe284d767de55e96
+    #     tree 8b0ff1534ec6bb2cddb17b5753dd1c26e181dfe1
+    #     parent ce31f0c8853f3899e1d3c909551d2caf16c6866d
+    #     author Lachie Cox <lachie@smartbomb.com.au> 1205469982 +1100
+    #     committer Lachie Cox <lachie@smartbomb.com.au> 1205469982 +1100
+    # 
+    #         added error checking to recipe_tasks
+    # 
+    #     12  0 data/welcome/Capfile
+    #      1 files changed, 12 insertions(+), 0 deletions(-)
+    #     
+    
+    # git
+    def git_log_recipe(limit=5)
+      changes = []
+      change = OpenStruct.new
+      Git.git.log( {:pretty => "raw", limit => true, :numstat => true, :shortstat => true}, 'master', '--', self.recipe_path).each do |line|
+        case line
+        when /^commit (.*)$/
+          changes << change = OpenStruct.new(:commit => $1)
+        when /^parent (.*)$/
+          change.parents ||= []
+          change.parents << $1
+        when /^author/
+          # nothing
+        when /^committer .*? <[^>]+> (\d+)/
+          change.time = Time.at(Integer($1))
+        when /^(\d+)\t(\d+)\t(.+)$/
+          change.insertions = Integer($1)
+          change.deletions  = Integer($2)
+          change.path       = $3
+        when /^\s+(.+)$/
+          change.log ||= ""
+          change.log += $1
+        end
+      end
+      
+      changes
+    end
+    
     
     def self.create(kind,name,&block)
       klass = class_from_name(kind)

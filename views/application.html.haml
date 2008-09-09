@@ -4,11 +4,12 @@
   %head
     %title Molly
     =css_include_tag 'application', 'humanmsg'
-    =js_include_tag 'jquery-1.2.6', 'application', 'humanmsg'
+    =js_include_tag 'jquery-1.2.6', 'humanmsg', 'application'
 
   %body
     #main
       #header
         %h1 molly
+        = Git.commits('master',1).first.id
       .site
         =catch_content :for_layout

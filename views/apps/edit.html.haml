@@ -4,7 +4,7 @@
 
 =form_for(:app, :method => 'put', :action => url(:app,@app.name)) do
   :plain
-    <textarea rows='24' cols='80'>
+    <textarea rows='24' cols='80' name='recipe'>
     #{@app.recipe_source}
     </textarea>
   

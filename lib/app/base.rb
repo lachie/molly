@@ -2,6 +2,9 @@ require 'fileutils'
 require 'ostruct'
 require 'pathname'
 
+require 'pp'
+
+
 module App
   class Base
     attr_reader :name, :last_run_key, :last_run_task, :app_root, :options
@@ -51,6 +54,10 @@ module App
       File.join(var_root,"#{key}.status")
     end
     
+    def recipe_path_relative
+      relative_path(self.recipe_path)
+    end
+    
     def relative_path(path)
       Pathname.new(path).relative_path_from(@app_path).to_s
     end
@@ -97,7 +104,7 @@ module App
       changes = []
       change = nil
       
-      path = relative_path(self.recipe_path)
+      path = recipe_path_relative
       git_args = [{:pretty => "raw", limit => true, :numstat => true, :shortstat => true}, 'master', '--', path]
       
       repo.git.log(*git_args).each do |line|
@@ -123,7 +130,28 @@ module App
     end
     
     def update_recipe(new_source)
+      # original_rev = repo.git.rev_list({:max_count => 1}, 'HEAD', '--', )
+      # open()
+
+      capfile = repo.status['Capfile']
       
+      Dir.chdir(app_root) do
+        pp repo.status
+      end
+      # pp repo.status.reject {|f| puts "#{f}"; f.path[/^logs/]}
+
+      
+      begin
+        Dir.chdir(app_root) do
+          open(recipe_path,'w') {|f| f << new_source}
+          repo.add(recipe_path_relative)
+          repo.commit_index('updated via interface') || raise
+        end
+      rescue
+        puts "failed to commit or something..."
+        # TODO git reset --hard HEAD^
+      end
+
     end
     
     

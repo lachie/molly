@@ -1,7 +1,7 @@
 require File.dirname(__FILE__) + '/../spec_helper'
 
 class CapRecipeFixture
-  include Recipes::Capistrano
+  include Recipe::Capistrano
   
   def name; :fixture_app end
   def app_root; "data/fixture_app" end
@@ -19,7 +19,7 @@ class BadCapRecipeFixture < CapRecipeFixture
   def name; :spots end
 end
 
-describe Recipes::Capistrano do
+describe Recipe::Capistrano do
   before do
     @app = CapRecipeFixture.new
     @bad_app = BadCapRecipeFixture.new

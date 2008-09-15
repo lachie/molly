@@ -2,4 +2,4 @@
 %ul
 -App::Base.apps.each do |(name,app)|
   %li
-    %a{:href => ('' / name)}=app.name
+    %a{:href => url(:app,app.name)}=app.name

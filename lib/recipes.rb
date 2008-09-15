@@ -12,7 +12,7 @@ require 'cap_runner'
 # run_task       run one of the tasks provided by the recipe
 # recipe_source  returns the source of the recipe file
 
-module Recipes
+module Recipe
   module Capistrano
 
     def recipe_name

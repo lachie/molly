@@ -1,18 +1,18 @@
 require 'fileutils'
 require 'ostruct'
+require 'pathname'
 
 module App
   class Base
     attr_reader :name, :last_run_key, :last_run_task, :app_root, :options
     attr_accessor :user_tasks
     
-    def initialize(name,options,&block)
-      @name = name
+    def initialize(name,options)
+      @name    = name
       @options = options
       
       @app_root = options[:root] || raise(ArgumentError, "no root specified for #{@name}")
-      
-      instance_eval(&block) if block_given?
+      @app_path = Pathname.new(@app_root)
       
       setup_paths
       setup_recipe
@@ -22,9 +22,11 @@ module App
       instance_values.only(*%w{name last_run_task last_run_key}).to_json(options)
     end
     
+    
+    # recipe
     def setup_recipe
-      raise(ArgumentError, "no recipe specified for #{@name}") unless options[:using_recipe]
-      self.extend App::Base.recipe(options[:using_recipe])
+      recipe = @options[:using_recipe] || raise(ArgumentError, "no recipe specified for #{@name}")
+      self.extend App::Base.recipe(recipe)
     end
     
     # paths
@@ -49,14 +51,23 @@ module App
       File.join(var_root,"#{key}.status")
     end
     
+    def relative_path(path)
+      Pathname.new(path).relative_path_from(@app_path).to_s
+    end
+    
     # logs
 
     def logs(page = 1)
       WillPaginate::Collection.create(page, 5) do |pager|
-        logs = Dir["#{var_root}/*.log"]
+        logs = Dir["#{var_root}/*.log"].reverse
         
         pager.total_entries = logs.size
-        pager.replace( logs.reverse[pager.offset, pager.per_page].collect {|d| Log.new(d, self)} )
+        
+        logs = logs[pager.offset, pager.per_page]
+        
+        logs.map! {|d| Log.new(d, self)}
+        
+        pager.replace(logs)
       end
     end
     
@@ -74,29 +85,26 @@ module App
       recipe_tasks + (user_tasks || [])
     end
     
+
+    # git goodies
+    def repo
+      @git_repo ||= Grit::Repo.new(app_root)
+    end
     
-    # commit c4555717a9f6002a05d806e8fe284d767de55e96
-    #     tree 8b0ff1534ec6bb2cddb17b5753dd1c26e181dfe1
-    #     parent ce31f0c8853f3899e1d3c909551d2caf16c6866d
-    #     author Lachie Cox <lachie@smartbomb.com.au> 1205469982 +1100
-    #     committer Lachie Cox <lachie@smartbomb.com.au> 1205469982 +1100
-    # 
-    #         added error checking to recipe_tasks
-    # 
-    #     12  0 data/welcome/Capfile
-    #      1 files changed, 12 insertions(+), 0 deletions(-)
-    #     
     
-    # git
+    # TODO this needs to move
     def git_log_recipe(limit=5)
       changes = []
-      change = OpenStruct.new
-      Git.git.log( {:pretty => "raw", limit => true, :numstat => true, :shortstat => true}, 'master', '--', self.recipe_path).each do |line|
+      change = nil
+      
+      path = relative_path(self.recipe_path)
+      git_args = [{:pretty => "raw", limit => true, :numstat => true, :shortstat => true}, 'master', '--', path]
+      
+      repo.git.log(*git_args).each do |line|
         case line
         when /^commit (.*)$/
-          changes << change = OpenStruct.new(:commit => $1)
+          changes << change = OpenStruct.new(:commit => $1, :parents => [], :log => "")
         when /^parent (.*)$/
-          change.parents ||= []
           change.parents << $1
         when /^author/
           # nothing
@@ -107,12 +115,15 @@ module App
           change.deletions  = Integer($2)
           change.path       = $3
         when /^\s+(.+)$/
-          change.log ||= ""
-          change.log += $1
+          change.log << $1 if change
         end
       end
       
       changes
+    end
+    
+    def update_recipe(new_source)
+      
     end
     
     
@@ -123,7 +134,7 @@ module App
     # TODO make this dynamic
     def self.recipe(recipe)
       case recipe.to_sym
-      when :capistrano; Recipes::Capistrano
+      when :capistrano; Recipe::Capistrano
       else
         raise "unknown recipe '#{recipe}'"
       end
@@ -134,19 +145,19 @@ module App
       Dir[::Merb::Config[:app_root] / '*'].each do |app_root|
         next unless File.directory?(app_root)
         
-        name = File.basename(app_root)
-        
-        # detect kind
-        kind = case
-                 when File.exist?(app_root / 'Capfile')
-                   :capistrano
-              end
-        
-        create(name, :using_recipe => kind, :root => app_root)
+        create(File.basename(app_root), :using_recipe => detect_recipe(app_root), :root => app_root)
         
         ::Merb.logger.info "  loaded #{name}"
       end
     end
+    
+    def self.detect_recipe(app_root)
+      case
+        when File.exist?(app_root / 'Capfile')
+          :capistrano
+      end
+    end
+    
     
     self.load_apps!
   end

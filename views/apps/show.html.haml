@@ -10,7 +10,7 @@
 
 %h3 tasks
 (
-%a{:href => ('' / @app.name / 'recipe')}==#{@app.recipe_name} recipe file
+%a{:href => url(:recipe_app,@app.name)}==#{@app.recipe_name} recipe file
 )
 
 %table
@@ -23,7 +23,7 @@
           =description.blank? ? '&ndash;' : description
         %td
           [
-          %a.run-task{:href => ('' / @app.name / 'run' / task)} run
+          %a.run-task{:href => url(:run_app_task, :app_id => @app.name, :id => task)} run
           ]
     %tr
       %td
@@ -62,7 +62,7 @@
         %td.icon
           =image_tag("#{log.status}.png")
         %td
-          %a{:href => ('' / @app.name / 'log' / log.key)}
+          %a{:href => url(:app_log, :app_id => @app.name, :id => log.key)}
             =log.task
         %td
           =time_ago_in_words(log.date)

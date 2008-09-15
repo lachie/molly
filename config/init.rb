@@ -10,14 +10,22 @@ Merb.push_path(:javascript,   Merb.dir_for(:public) / "javascripts", nil)
 Merb.push_path(:image,        Merb.dir_for(:public) / "images", nil)
 
 Merb::Router.prepare do |r|
+  r.resources(:apps, :member => {:recipe => :get}) do |app|
+    app.resources(:logs)
+    app.resources(:tasks, :member => {:run => :get})
+  end
+
+
+
   r.match('/:app/log/:key').to(:controller => 'apps', :action => 'log')
   
-  r.match('/:app').to(:controller => 'apps', :action => 'show')
-  r.match('/:app/:command').to(:controller => 'apps', :action => ':command')
+  # r.match('/:id').to(:controller => 'apps', :action => 'show')
+  # r.match('/:id/:command').to(:controller => 'apps', :action => ':command')
   
   
   # r.match('/:app/:command/:task').to(:controller => 'apps', :action => ':command')
   r.match(%r[^/:app/:command/(.+)]).to(:controller => 'apps', :action => ':command', :task => '[3]')
+  
   
   r.match('/').to(:controller => 'apps', :action =>'index')
   
@@ -27,20 +35,14 @@ end
 # require 'application'
 
 use_test :rspec
-dependencies 'merb-haml', 'merb-assets', 'activesupport', 'merb_paginate'
+dependencies 'merb-haml', 'merb-assets', 'activesupport', 'merb_paginate', 'merb_helpers'
 
 
 gem 'mojombo-grit'
 require 'grit'
 
 Grit.debug = true
-::Git = Grit::Repo.new(Merb.root)
 
-
-
-# gem('mislav-will_paginate')
-# require 'will_paginate/array'
-# require 'will_paginate/view_helpers'
 
 Merb::Config.use { |c|
   c[:environment]         = 'production',
@@ -58,10 +60,9 @@ Merb::Config.use { |c|
   
   
   c[:cap] = '/usr/bin/cap'  
-  c[:app_root] = Merb.root + "/../molly_apps"
+  c[:app_root] = File.expand_path(Merb.root + "/../molly_apps")
 }
 
-# Merb::BootLoader.after_app_loads do
-#   require 'app'
-#   require 'recipes'
-# end
+Merb::BootLoader.after_app_loads do
+  
+end

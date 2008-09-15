@@ -29,8 +29,8 @@ $(function() {
   
   $('.run', runner).click(function() {
     var text = $('.reason textarea').val(),
-      url = runner.data('taskurl'),
-      task = url.split('/',4)[3]
+         url = runner.data('taskurl'),
+        task = url.split('/',4)[3]
     
     if(text.blank()) {
       humanMsg.displayMsg("you need to supply a reason for why you're running this task")

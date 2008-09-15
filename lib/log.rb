@@ -7,6 +7,8 @@ class Log
     @file,@app = file,app
     
     _,@key,@task = *@file.match(/(\d+)_([\w:,]+)\.log/)
+    
+    raise(ArgumentError, "log's filename #{@file} was malformed (task: #{@task}, key: #{@key})") unless @key && @task
   end
   
   def date

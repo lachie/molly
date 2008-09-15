@@ -39,7 +39,7 @@ module Helpers
   end
   
   def back_to_app
-    "<a href='/#{@app.name}'>&larr; #{@app.name}</a>"
+    "<a href='/apps/#{@app.name}'>&larr; #{@app.name}</a>"
   end
 
 end
@@ -53,16 +53,27 @@ class LogLinkRenderer < MerbPaginate::LinkRenderer
   end
 end
 
-
-class Apps < Merb::Controller
+class Molly < Merb::Controller
   include Helpers
   
-  before :load_app, :exclude => [:index]
+  # def _template_location(action, type = nil, controller = controller_name)
+  #     Merb.logger.debug "template location... #{action} ... #{type} ... #{controller}"
+  #     "#{}#{action}.#{type}"
+  #   end
   
-  def _template_location(action, type = nil, controller = controller_name)
-    Merb.logger.debug "template location... #{action} ... #{type} ... #{controller}"
-    "#{action}.#{type}"
+  protected
+  
+  def load_app
+    app_id = params[:app_id] || params[:id] || raise("no app id supplied")
+    @app = App::Base.apps[app_id.to_sym] || raise("unable to find app '#{app_id}'")
+    @app.user_tasks = session[:user_tasks] || []
   end
+
+end
+
+
+class Apps < Molly
+  before :load_app, :exclude => [:index]
 
   def index
     puts "in index..."
@@ -75,32 +86,19 @@ class Apps < Merb::Controller
     display @app
   end
   
+  def update
+    @app.update_recipe(params[:recipe])
+    redirect url(:recipe_app,@app.name)
+  end
+  
   def recipe
-    Merb.logger.debug "foobar, recipe #{@app}"
-    render
+    display @app
   end
   
-  def run
-    provides :html, :json
-
-    @app.run_task(params[:task],params[:reason])
-    
-    redirect '' / @app.name / 'log' / @app.last_run_key
-    
-    # if request.xhr?
-    #       display @app
-    #     else
-    #       redirect '' / params[:app]
-    #     end
-  end
-  
-  def log
-    if key = params[:key]
-      @log = @app.log(key)
-      render
-    else
-      redirect "/#{params[:app]}"
-    end
+  def edit
+    puts "fC: #{}"
+    self.class._form_class = Merb::Helpers::Form::Builder::ResourcefulFormWithErrors
+    display @app
   end
   
   def add_task
@@ -117,22 +115,39 @@ class Apps < Merb::Controller
     
     redirect "/#{params[:app]}"
   end
+
   
+end
+
+
+class Logs < Molly
+  before :load_app
   
-  protected
+  def show
+    @log = @app.log(params[:id])
+    display @log
+  end
+end
+
+class Tasks < Molly
+  before :load_app
+
+  def show
+    render
+  end
   
-  def load_app
-    if params[:app].blank?
-      raise "application name wasn't specified"
-    end
+  def run
+    provides :html, :json
+
+    @app.run_task(params[:id],params[:reason])
     
-    @app = App::Base.apps[params[:app].to_sym]
+    redirect url(:app_log, :app_id => @app.name, :id => @app.last_run_key)
     
-    unless @app
-      raise "unable to find app '#{params[:app]}'"
-    end
-    
-    @app.user_tasks = session[:user_tasks] || []
+    # if request.xhr?
+    #       display @app
+    #     else
+    #       redirect '' / params[:app]
+    #     end
   end
   
 end

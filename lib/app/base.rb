@@ -3,12 +3,16 @@ require 'ostruct'
 
 module App
   class Base
-    attr_reader :name, :last_run_key, :last_run_task
+    attr_reader :name, :last_run_key, :last_run_task, :app_root, :options
     attr_accessor :user_tasks
     
-    def initialize(name,&block)
+    def initialize(name,options,&block)
       @name = name
-      instance_eval(&block)
+      @options = options
+      
+      @app_root = options[:root] || raise(ArgumentError, "no root specified for #{@name}")
+      
+      instance_eval(&block) if block_given?
       
       setup_paths
       setup_recipe
@@ -18,19 +22,15 @@ module App
       instance_values.only(*%w{name last_run_task last_run_key}).to_json(options)
     end
     
-    def using_recipe(recipe)
-      self.extend App::Base.recipe(recipe)
+    def setup_recipe
+      raise(ArgumentError, "no recipe specified for #{@name}") unless options[:using_recipe]
+      self.extend App::Base.recipe(options[:using_recipe])
     end
     
     # paths
     
     def setup_paths
-      FileUtils::mkdir_p app_root
       FileUtils::mkdir_p var_root
-    end
-    
-    def app_root
-      ::Merb.root_path('data',name.to_s)
     end
     
     def var_root
@@ -50,12 +50,14 @@ module App
     end
     
     # logs
-        
+
     def logs(page = 1)
-      Dir["#{var_root}/*.log"] \
-        .collect {|d| Log.new(d, self)} \
-        .reverse \
-        .paginate(:per_page => 5, :page => page)
+      WillPaginate::Collection.create(page, 5) do |pager|
+        logs = Dir["#{var_root}/*.log"]
+        
+        pager.total_entries = logs.size
+        pager.replace( logs.reverse[pager.offset, pager.per_page].collect {|d| Log.new(d, self)} )
+      end
     end
     
     def log(key)
@@ -63,8 +65,9 @@ module App
       Log.new(log,self)
     end
     
+    @apps = {}
     def self.apps
-      @apps ||= {}
+      @apps
     end
     
     def tasks
@@ -113,19 +116,8 @@ module App
     end
     
     
-    def self.create(kind,name,&block)
-      klass = class_from_name(kind)
-      apps[name.to_sym] = klass.new(name,&block)
-    end
-    
-    # TODO make this dynamic for subclasses
-    def self.class_from_name(name)
-      case name.to_sym
-      when :rails; App::Rails
-      when :merb ; App::Merb
-      else
-        raise "unknown app type '#{name}'"
-      end
+    def self.create(name,options,&block)
+      apps[name.to_sym] = self.new(name,options,&block)
     end
     
     # TODO make this dynamic
@@ -136,12 +128,26 @@ module App
         raise "unknown recipe '#{recipe}'"
       end
     end
-  end
-end
-
-class Object
-  # loads an app definition block
-  def app(kind,name,&block)
-    App::Base.create(kind,name,&block)
+    
+    def self.load_apps!
+      ::Merb.logger.info "loading apps"
+      Dir[::Merb::Config[:app_root] / '*'].each do |app_root|
+        next unless File.directory?(app_root)
+        
+        name = File.basename(app_root)
+        
+        # detect kind
+        kind = case
+                 when File.exist?(app_root / 'Capfile')
+                   :capistrano
+              end
+        
+        create(name, :using_recipe => kind, :root => app_root)
+        
+        ::Merb.logger.info "  loaded #{name}"
+      end
+    end
+    
+    self.load_apps!
   end
 end

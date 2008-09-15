@@ -1,3 +1,4 @@
-require 'app/base'
-require 'app/rails'
-require 'app/merb'
+require "recipes"
+require "log"
+         
+require "app/base"

@@ -57,15 +57,11 @@ Merb::Config.use { |c|
   c[:reload_time]         = 0.5
   
   
-  c[:cap] = '/usr/bin/cap'
+  c[:cap] = '/usr/bin/cap'  
+  c[:app_root] = Merb.root + "/../molly_apps"
 }
 
-Merb::BootLoader.after_app_loads do
-  require 'pp'
-  require 'app'
-  require 'recipes'
-  require Merb.root / 'config' / 'apps'
-  # require Merb.root / 'apps'
-  
-  
-end
+# Merb::BootLoader.after_app_loads do
+#   require 'app'
+#   require 'recipes'
+# end

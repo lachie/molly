@@ -1,15 +1,16 @@
 # encapsulates the residue of a run of a task
 
 class Log
-  attr_reader :key,:task,:date
+  attr_reader :key,:task
   
   def initialize(file,app)
     @file,@app = file,app
     
     _,@key,@task = *@file.match(/(\d+)_([\w:,]+)\.log/)
-    @date = DateTime.strptime(@key,"%Y%m%d%H%M%S")
-    
-
+  end
+  
+  def date
+    @date ||= DateTime.strptime(@key,"%Y%m%d%H%M%S")
   end
   
   def status
@@ -25,17 +26,28 @@ class Log
     @status
   end
   
+  def reason
+    unless @reason
+      @reason = []
+      each_line do |line,stream|
+        @reason << line if stream == :reason
+      end
+    end
+    
+    @reason
+  end
+  
   def each_line(&block)
     IO.foreach(@file) do |line|
       line.chomp!
       
       stream = case line[0]
                 when ?O
-                  'out'
+                  :out
                 when ?E
-                  'err'
+                  :err
                 when ?R
-                  'reason'
+                  :reason
                 end
       
       line[0,2] = ''

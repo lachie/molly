@@ -71,6 +71,7 @@ class Apps < Merb::Controller
   
   def show
     @log_page = params[:log_page] || 1
+    @logs = @app.logs(@log_page)
     display @app
   end
   

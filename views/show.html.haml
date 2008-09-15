@@ -53,11 +53,11 @@
     %a.cancel{:href=>'#'} cancel
 
 %h3 logs
-=merb_paginate @app.logs(@log_page), :renderer => LogLinkRenderer
+=merb_paginate @logs, :renderer => LogLinkRenderer
 
 %table.logs
   %tbody
-    -@app.logs(@log_page).each do |log|
+    -@logs.each do |log|
       %tr
         %td.icon
           =image_tag("#{log.status}.png")

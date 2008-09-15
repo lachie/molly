@@ -4,15 +4,19 @@
   &mdash;
   =@log.task
 
-%p
+.navigation
   =back_to_app
-%p
+  
+.detail
   ==run #{time_ago_in_words(@log.date)} ago
 
+.reason
+  =@log.reason
   
 %p
   %table
     -@log.each_line do |line,stream|
+      -next if stream == :reason
       %tr{:class => stream}
         %td
           =line
